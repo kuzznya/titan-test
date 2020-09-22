@@ -18,6 +18,6 @@ public class UnorderedCalculationResult extends CalculationResult implements Csv
 
     @Override
     public List<Object> getData() {
-        return List.of(super.getCalculationId(), funcId, super.getResult(), super.getExecutionTime());
+        return List.of(super.getCalculationId(), funcId, super.getResult(), super.getExecutionTime().toMillis());
     }
 }

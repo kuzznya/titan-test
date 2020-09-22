@@ -20,10 +20,10 @@ public class OrderedCalculationResult implements CsvResult {
         return List.of(
                 calculationId,
                 func1Result.getResult(),
-                func1Result.getExecutionTime(),
+                func1Result.getExecutionTime().toMillis(),
                 func1FurtherResultsCount,
                 func2Result.getResult(),
-                func2Result.getExecutionTime(),
+                func2Result.getExecutionTime().toMillis(),
                 func2FurtherResultsCount
         );
     }
