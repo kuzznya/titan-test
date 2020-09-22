@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
@@ -19,6 +21,12 @@ repositories {
 }
 
 dependencies {
+    if (Os.isFamily(Os.FAMILY_WINDOWS))
+        implementation 'com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0'
+    else if (Os.isFamily(Os.FAMILY_MAC))
+        implementation 'com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0'
+    else if (Os.isFamily(Os.FAMILY_UNIX))
+        implementation 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'com.opencsv:opencsv:5.2'
     compileOnly 'org.projectlombok:lombok'
