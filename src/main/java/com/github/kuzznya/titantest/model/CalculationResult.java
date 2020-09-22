@@ -10,6 +10,7 @@ import java.time.Duration;
 @Getter
 @EqualsAndHashCode
 public class CalculationResult {
+    private final int calculationId;
     private final Object result;
     private final Duration executionTime;
 }
