@@ -7,6 +7,8 @@ return idx;
 
 func2="
 idx *= 2;
+var now = new Date().getTime();
+while(new Date().getTime() < now + 2000){} 
 return idx;
 "
 
@@ -20,7 +22,9 @@ data="{
 
 data="${data//[$'\t\r\n']}"
 
+type=ordered
+
 curl --header "Content-Type: application/json" \
      --request POST \
      --data "$data" \
-     http://localhost:8080/api/v1/calculations
+     http://localhost:8080/api/v1/calculations/$type
