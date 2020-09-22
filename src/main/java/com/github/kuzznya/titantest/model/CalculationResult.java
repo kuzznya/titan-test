@@ -9,7 +9,7 @@ import java.time.Duration;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class Calculation {
+public class CalculationResult {
     private final Object result;
     private final Duration executionTime;
 }

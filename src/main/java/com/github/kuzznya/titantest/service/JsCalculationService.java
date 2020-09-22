@@ -2,7 +2,7 @@ package com.github.kuzznya.titantest.service;
 
 import com.github.kuzznya.titantest.exception.EvaluationException;
 import com.github.kuzznya.titantest.exception.InternalEvaluationException;
-import com.github.kuzznya.titantest.model.Calculation;
+import com.github.kuzznya.titantest.model.CalculationResult;
 import com.github.kuzznya.titantest.properties.CalculationProperties;
 import org.springframework.stereotype.Service;
 
@@ -18,23 +18,20 @@ public class JsCalculationService implements CalculationService {
 
     private ScriptEngine engine;
 
-    private CalculationProperties properties;
-
     private Integer functionHashCode;
 
-    public JsCalculationService(CalculationProperties properties) {
+    public JsCalculationService() {
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
-        this.properties = properties;
     }
 
     private void evaluateFunction(String name, String code) throws ScriptException {
         if (functionHashCode != null && code.hashCode() == functionHashCode)
             return;
         engine.eval("function " + name + "(int executionIdx) {" + code + "}");
-        functionHashCode = code.hashCode();.3    
+        functionHashCode = code.hashCode();
     }
 
-    public Calculation calculate(String code, int idx) {
+    public CalculationResult calculate(String code, int idx) {
         try {
             evaluateFunction("test", code);
             Invocable invocable = (Invocable) engine;
@@ -43,7 +40,7 @@ public class JsCalculationService implements CalculationService {
             Object result = invocable.invokeFunction("test", idx);
             Instant end = Instant.now();
 
-            return new Calculation(result, Duration.between(start, end));
+            return new CalculationResult(result, Duration.between(start, end));
 
         } catch (ScriptException ex) {
             throw new EvaluationException(ex);
