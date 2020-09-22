@@ -8,7 +8,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "titantest")
 @Data
 public class CalculationProperties {
-    private final int delayMillis;
+    private int delayMillis = 1000;
 
     public Duration getEvaluationDelay() {
         return Duration.ofMillis(delayMillis);

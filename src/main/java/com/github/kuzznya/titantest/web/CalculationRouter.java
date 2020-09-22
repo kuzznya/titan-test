@@ -14,7 +14,7 @@ public class CalculationRouter {
         return RouterFunctions
                 .route()
                 .POST("/api/v1/calculations", handler::calculate)
-                .GET("/api/v1/calculations", handler::calculate)
+                .GET("/api/v1/calculations", handler::calculateTest)
                 .build();
     }
 }

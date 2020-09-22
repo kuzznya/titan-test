@@ -1,12 +1,14 @@
 package com.github.kuzznya.titantest.service;
 
-import com.github.kuzznya.titantest.model.*;
+import com.github.kuzznya.titantest.model.Calculation;
+import com.github.kuzznya.titantest.model.CalculationResult;
+import com.github.kuzznya.titantest.model.OrderedCalculationResult;
+import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
 import com.github.kuzznya.titantest.properties.CalculationProperties;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 @Service
 public class DefaultCalculationSeriesService implements CalculationSeriesService {
@@ -22,7 +24,7 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
 
     private Flux<CalculationResult> calculate(String function, int count) {
         final Calculation calculation = factoryService.createCalculation(function);
-        return Flux.fromStream(Stream.iterate(0, UnaryOperator.identity()).limit(count))
+        return Flux.fromStream(IntStream.range(0, count).boxed())
                 .delayElements(properties.getEvaluationDelay())
                 .map(calculation::calculate);
     }

@@ -20,7 +20,7 @@ public class JsCalculation implements Calculation {
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
         try {
-            engine.eval("function test(int executionIdx) {" + code + "}");
+            engine.eval("function test(idx) {" + code + "}");
         } catch (ScriptException ex) {
             throw new EvaluationException(ex);
         }
@@ -35,7 +35,7 @@ public class JsCalculation implements Calculation {
             Object result = invocable.invokeFunction("test", idx);
             Instant end = Instant.now();
 
-            return new CalculationResult(result, Duration.between(start, end));
+            return new CalculationResult(idx, result, Duration.between(start, end));
 
         } catch (ScriptException ex) {
             throw new EvaluationException(ex);

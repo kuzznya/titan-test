@@ -1,25 +1,48 @@
 package com.github.kuzznya.titantest.web;
 
+import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
+import com.github.kuzznya.titantest.service.CalculationSeriesService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 @Component
 public class CalculationHandler {
 
+    private final CalculationSeriesService seriesService;
+
+    public CalculationHandler(CalculationSeriesService seriesService) {
+        this.seriesService = seriesService;
+    }
+
     public Mono<ServerResponse> calculate(ServerRequest request) {
-        return ServerResponse
-                .ok()
+        Mono<CalculationRequest> bodyMono = request.bodyToMono(CalculationRequest.class);
+        return bodyMono.flatMap(calculationRequest ->
+                ServerResponse.ok()
                 .contentType(MediaType.TEXT_EVENT_STREAM)
                 .body(
-                        Flux.just(1, 2, 3, 4, 5, 6, 7)
-                                .delayElements(Duration.ofSeconds(1)),
-                        Integer.class
+                        seriesService.calculateUnordered(
+                                calculationRequest.getFunction1(),
+                                calculationRequest.getFunction2(),
+                                calculationRequest.getCount())
+                                .map(UnorderedCalculationResult::getDataAsString),
+                        String.class
+                )
+        );
+    }
+
+    public Mono<ServerResponse> calculateTest(ServerRequest request) {
+        return ServerResponse.ok()
+                .contentType(MediaType.TEXT_EVENT_STREAM)
+                .body(
+                        seriesService.calculateUnordered(
+                                "return idx;",
+                                "return idx * 2;",
+                                100
+                        ).map(UnorderedCalculationResult::getDataAsString),
+                        String.class
                 );
     }
 }
