@@ -1,10 +1,7 @@
-package com.github.kuzznya.titantest.service;
+package com.github.kuzznya.titantest.model;
 
 import com.github.kuzznya.titantest.exception.EvaluationException;
 import com.github.kuzznya.titantest.exception.InternalEvaluationException;
-import com.github.kuzznya.titantest.model.CalculationResult;
-import com.github.kuzznya.titantest.properties.CalculationProperties;
-import org.springframework.stereotype.Service;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -13,27 +10,25 @@ import javax.script.ScriptException;
 import java.time.Duration;
 import java.time.Instant;
 
-@Service
-public class JsCalculationService implements CalculationService {
+public class JsCalculation implements Calculation {
 
-    private ScriptEngine engine;
+    private final ScriptEngine engine;
 
     private Integer functionHashCode;
 
-    public JsCalculationService() {
+    public JsCalculation(String code) {
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
-    }
 
-    private void evaluateFunction(String name, String code) throws ScriptException {
-        if (functionHashCode != null && code.hashCode() == functionHashCode)
-            return;
-        engine.eval("function " + name + "(int executionIdx) {" + code + "}");
-        functionHashCode = code.hashCode();
-    }
-
-    public CalculationResult calculate(String code, int idx) {
         try {
-            evaluateFunction("test", code);
+            engine.eval("function test(int executionIdx) {" + code + "}");
+        } catch (ScriptException ex) {
+            throw new EvaluationException(ex);
+        }
+    }
+
+    @Override
+    public CalculationResult calculate(int idx) {
+        try {
             Invocable invocable = (Invocable) engine;
 
             Instant start = Instant.now();
