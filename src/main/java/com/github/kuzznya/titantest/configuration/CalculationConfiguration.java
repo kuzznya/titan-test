@@ -6,5 +6,5 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(CalculationProperties.class)
-public class AppConfiguration {
+public class CalculationConfiguration {
 }
