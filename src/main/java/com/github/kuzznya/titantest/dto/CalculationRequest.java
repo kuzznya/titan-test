@@ -1,4 +1,4 @@
-package com.github.kuzznya.titantest.web;
+package com.github.kuzznya.titantest.dto;
 
 import lombok.Data;
 

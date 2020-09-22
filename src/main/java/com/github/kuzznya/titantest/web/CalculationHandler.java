@@ -1,5 +1,7 @@
 package com.github.kuzznya.titantest.web;
 
+import com.github.kuzznya.titantest.dto.CalculationRequest;
+import com.github.kuzznya.titantest.model.OrderedCalculationResult;
 import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
 import com.github.kuzznya.titantest.service.CalculationSeriesService;
 import org.springframework.http.MediaType;
@@ -17,7 +19,7 @@ public class CalculationHandler {
         this.seriesService = seriesService;
     }
 
-    public Mono<ServerResponse> calculate(ServerRequest request) {
+    public Mono<ServerResponse> calculateUnordered(ServerRequest request) {
         Mono<CalculationRequest> bodyMono = request.bodyToMono(CalculationRequest.class);
         return bodyMono.flatMap(calculationRequest ->
                 ServerResponse.ok()
@@ -33,15 +35,31 @@ public class CalculationHandler {
         );
     }
 
+    public Mono<ServerResponse> calculateOrdered(ServerRequest request) {
+        Mono<CalculationRequest> bodyMono = request.bodyToMono(CalculationRequest.class);
+        return bodyMono.flatMap(calculationRequest ->
+                ServerResponse.ok()
+                        .contentType(MediaType.TEXT_EVENT_STREAM)
+                        .body(
+                                seriesService.calculateOrdered(
+                                        calculationRequest.getFunction1(),
+                                        calculationRequest.getFunction2(),
+                                        calculationRequest.getCount())
+                                        .map(OrderedCalculationResult::getDataAsString),
+                                String.class
+                        )
+        );
+    }
+
     public Mono<ServerResponse> calculateTest(ServerRequest request) {
         return ServerResponse.ok()
                 .contentType(MediaType.TEXT_EVENT_STREAM)
                 .body(
-                        seriesService.calculateUnordered(
+                        seriesService.calculateOrdered(
                                 "return idx;",
                                 "return idx * 2;",
                                 100
-                        ).map(UnorderedCalculationResult::getDataAsString),
+                        ).map(OrderedCalculationResult::getDataAsString),
                         String.class
                 );
     }

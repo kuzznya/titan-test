@@ -8,6 +8,7 @@ import com.github.kuzznya.titantest.properties.CalculationProperties;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 @Service
@@ -51,6 +52,20 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
 
     @Override
     public Flux<OrderedCalculationResult> calculateOrdered(String function1, String function2, int count) {
-        return null;
+        AtomicInteger counter = new AtomicInteger(0);
+
+        Flux<CalculationResult> calculation1 = calculate(function1, count).doOnNext(result -> counter.incrementAndGet());
+        Flux<CalculationResult> calculation2 = calculate(function2, count).doOnNext(result -> counter.decrementAndGet());
+
+        return calculation1.zipWith(calculation2,
+                (result1, result2) -> OrderedCalculationResult
+                        .builder()
+                        .calculationId(result1.getCalculationId())
+                        .func1Result(result1)
+                        .func1FurtherResultsCount(Math.max(counter.get(), 0))
+                        .func2Result(result2)
+                        .func2FurtherResultsCount(Math.max(-counter.get(), 0))
+                        .build()
+        );
     }
 }

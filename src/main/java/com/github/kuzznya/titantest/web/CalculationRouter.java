@@ -13,8 +13,9 @@ public class CalculationRouter {
     public RouterFunction<ServerResponse> calculationRoutes(CalculationHandler handler) {
         return RouterFunctions
                 .route()
-                .POST("/api/v1/calculations", handler::calculate)
-                .GET("/api/v1/calculations", handler::calculateTest)
+                .POST("/api/v1/calculations/unordered", handler::calculateUnordered)
+                .POST("/api/v1/calculations/ordered", handler::calculateOrdered)
+                .GET("/api/v1/calculations/ordered", handler::calculateTest)
                 .build();
     }
 }
