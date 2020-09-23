@@ -1,6 +1,7 @@
 package com.github.kuzznya.titantest.web;
 
 import com.github.kuzznya.titantest.dto.CalculationRequest;
+import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
 import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
 import com.github.kuzznya.titantest.service.CalculationSeriesService;
@@ -29,7 +30,10 @@ public class CalculationHandler {
                                 calculationRequest.getFunction1(),
                                 calculationRequest.getFunction2(),
                                 calculationRequest.getCount())
-                                .map(UnorderedCalculationResult::getDataAsString),
+                                .map(UnorderedCalculationResult::getDataAsString)
+                                .onErrorResume(FunctionExecutionException.class,
+                                        ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
+                                .onErrorReturn("EXECUTION ERROR"),
                         String.class
                 )
         );
@@ -45,22 +49,12 @@ public class CalculationHandler {
                                         calculationRequest.getFunction1(),
                                         calculationRequest.getFunction2(),
                                         calculationRequest.getCount())
-                                        .map(OrderedCalculationResult::getDataAsString),
+                                        .map(OrderedCalculationResult::getDataAsString)
+                                        .onErrorResume(FunctionExecutionException.class,
+                                                ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
+                                        .onErrorReturn("EXECUTION ERROR"),
                                 String.class
                         )
         );
-    }
-
-    public Mono<ServerResponse> calculateTest(ServerRequest request) {
-        return ServerResponse.ok()
-                .contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(
-                        seriesService.calculateOrdered(
-                                "return idx;",
-                                "return idx * 2;",
-                                100
-                        ).map(OrderedCalculationResult::getDataAsString),
-                        String.class
-                );
     }
 }

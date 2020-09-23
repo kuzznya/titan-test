@@ -37,7 +37,7 @@ public class JsCalculation implements Calculation {
             return new CalculationResult(idx, result, Duration.between(start, end));
 
         } catch (ScriptException ex) {
-            throw new FunctionExecutionException(ex);
+            throw new FunctionExecutionException(idx, ex);
         } catch (NoSuchMethodException ex) {
             throw new InternalCalculationException(ex);
         }

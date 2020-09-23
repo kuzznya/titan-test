@@ -41,7 +41,7 @@ public class V8Calculation implements Calculation {
             runtime.release();
             return new CalculationResult(idx, result, Duration.between(start, end));
         } catch (Exception ex) {
-            throw new FunctionExecutionException(ex);
+            throw new FunctionExecutionException(idx, ex);
         }
     }
 }

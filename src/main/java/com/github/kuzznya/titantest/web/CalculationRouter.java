@@ -15,7 +15,6 @@ public class CalculationRouter {
                 .route()
                 .POST("/api/v1/calculations/unordered", handler::calculateUnordered)
                 .POST("/api/v1/calculations/ordered", handler::calculateOrdered)
-                .GET("/api/v1/calculations/ordered", handler::calculateTest)
                 .build();
     }
 }
