@@ -36,4 +36,22 @@ public class V8CalculationTest extends CalculationApiTest {
     public void calculateUnordered_WhenExecutionError_ReturnErrorMessage() {
         super.calculateUnordered_WhenExecutionError_ReturnErrorMessage();
     }
+
+    @Test
+    @Override
+    public void calculateOrdered_WhenValidRequest_GetResult() {
+        super.calculateOrdered_WhenValidRequest_GetResult();
+    }
+
+    @Test
+    @Override
+    public void calculateOrdered_WhenInvalidRequest_ReturnError() {
+        super.calculateOrdered_WhenInvalidRequest_ReturnError();
+    }
+
+    @Test
+    @Override
+    public void calculateOrdered_WhenExecutionError_ReturnErrorMessage() {
+        super.calculateOrdered_WhenExecutionError_ReturnErrorMessage();
+    }
 }

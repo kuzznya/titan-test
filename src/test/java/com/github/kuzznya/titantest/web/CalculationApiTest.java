@@ -87,4 +87,75 @@ public abstract class CalculationApiTest {
                 .expectComplete()
                 .verify();
     }
+
+    public void calculateOrdered_WhenValidRequest_GetResult() {
+        Flux<String> result = webClient.post()
+                .uri("/api/v1/calculations/ordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "return idx;",
+                                "var now = new Date().getTime();\n" +
+                                        "while(new Date().getTime() < now + 100){ }\n" +
+                                        "return idx * 2;",
+                                5
+                        ))
+                )
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class).getResponseBody();
+
+        StepVerifier.Step<String> step = StepVerifier.create(result);
+
+        for (int i = 0; i < 5; i++) {
+            int finalI = i;
+            step = step.expectNextMatches(s ->
+                    s.matches(finalI + ", " + finalI + "(\\.0)?, \\d+, 0, " + finalI * 2 + "(\\.0)?, \\d+, 0"));
+        }
+        step.expectComplete().verify();
+    }
+
+    public void calculateOrdered_WhenInvalidRequest_ReturnError() {
+        webClient.post()
+                .uri("/api/v1/calculations/ordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "INVALID_SYNTAX_FU{N}C",
+                                "var now = new Date().getTime();\n" +
+                                        "while(new Date().getTime() < now + 100){ }\n" +
+                                        "return idx * 2;",
+                                5
+                        ))
+                )
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    public void calculateOrdered_WhenExecutionError_ReturnErrorMessage() {
+        Flux<String> result = webClient.post()
+                .uri("/api/v1/calculations/ordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "if (idx === 2) throw new Error('error'); " +
+                                        "return idx;",
+                                "var now = new Date().getTime();\n" +
+                                        "while(new Date().getTime() < now + 100){ }\n" +
+                                        "return idx * 2;",
+                                4
+                        ))
+                )
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class)
+                .getResponseBody();
+
+        StepVerifier.create(result)
+                .expectNextMatches(s -> s.matches("0, 0(\\.0)?, \\d+, 0, 0(\\.0)?, \\d+, 0"))
+                .expectNextMatches(s -> s.matches("1, 1(\\.0)?, \\d+, 0, 2(\\.0)?, \\d+, 0"))
+                .expectNextMatches(s -> s.matches("EXECUTION (\\d+ )?ERROR"))
+                .expectComplete()
+                .verify();
+    }
 }
