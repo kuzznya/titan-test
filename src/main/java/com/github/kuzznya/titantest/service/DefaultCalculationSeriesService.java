@@ -1,8 +1,5 @@
 package com.github.kuzznya.titantest.service;
 
-import com.github.kuzznya.titantest.exception.CalculationException;
-import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
-import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.model.Calculation;
 import com.github.kuzznya.titantest.model.CalculationResult;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
@@ -18,18 +15,18 @@ import java.util.stream.IntStream;
 @Service
 public class DefaultCalculationSeriesService implements CalculationSeriesService {
 
-    private final CalculationFactoryService factoryService;
+    private final CalculationFactory calculationFactory;
     private final CalculationProperties properties;
 
-    public DefaultCalculationSeriesService(CalculationFactoryService factoryService,
+    public DefaultCalculationSeriesService(CalculationFactory calculationFactory,
                                            CalculationProperties properties) {
-        this.factoryService = factoryService;
+        this.calculationFactory = calculationFactory;
         this.properties = properties;
     }
 
     private Flux<CalculationResult> calculate(String function, int count) {
         final Mono<Calculation> calculation = Mono
-                .fromSupplier(() -> factoryService.createCalculation(function));
+                .fromSupplier(() -> calculationFactory.createCalculation(function));
         return calculation
                 .flatMapMany(calc -> Flux.fromStream(IntStream.range(0, count).boxed())
                 .delayElements(properties.getEvaluationDelay())

@@ -1,11 +1,11 @@
 package com.github.kuzznya.titantest.service;
 
 import com.github.kuzznya.titantest.model.Calculation;
-import com.github.kuzznya.titantest.model.V8Calculation;
+import com.github.kuzznya.titantest.model.JsCalculation;
 
-public class V8CalculationFactoryService implements CalculationFactoryService {
+public class JsCalculationFactory implements CalculationFactory {
     @Override
     public Calculation createCalculation(String code) {
-        return new V8Calculation(code);
+        return new JsCalculation(code);
     }
 }

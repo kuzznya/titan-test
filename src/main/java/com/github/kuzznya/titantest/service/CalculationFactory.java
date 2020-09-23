@@ -2,6 +2,6 @@ package com.github.kuzznya.titantest.service;
 
 import com.github.kuzznya.titantest.model.Calculation;
 
-public interface CalculationFactoryService {
+public interface CalculationFactory {
     Calculation createCalculation(String code);
 }

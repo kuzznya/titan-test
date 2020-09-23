@@ -2,9 +2,9 @@ package com.github.kuzznya.titantest.configuration;
 
 import com.github.kuzznya.titantest.exception.InternalCalculationException;
 import com.github.kuzznya.titantest.properties.CalculationProperties;
-import com.github.kuzznya.titantest.service.CalculationFactoryService;
-import com.github.kuzznya.titantest.service.JsCalculationFactoryService;
-import com.github.kuzznya.titantest.service.V8CalculationFactoryService;
+import com.github.kuzznya.titantest.service.CalculationFactory;
+import com.github.kuzznya.titantest.service.JsCalculationFactory;
+import com.github.kuzznya.titantest.service.V8CalculationFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +20,12 @@ public class CalculationConfiguration {
     }
 
     @Bean
-    public CalculationFactoryService calculationFactoryService() {
+    public CalculationFactory calculationFactoryService() {
         switch (properties.getJsEngine()) {
             case NASHORN:
-                return new JsCalculationFactoryService();
+                return new JsCalculationFactory();
             case V8:
-                return new V8CalculationFactoryService();
+                return new V8CalculationFactory();
         }
         throw new InternalCalculationException("Cannot create CalculationFactoryService: no suitable JS engine");
     }
