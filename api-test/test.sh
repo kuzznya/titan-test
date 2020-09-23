@@ -8,6 +8,7 @@ return idx;
 func2="
 idx *= 2;
 var now = new Date().getTime();
+dedede
 while(new Date().getTime() < now + 2000){} 
 return idx;
 "

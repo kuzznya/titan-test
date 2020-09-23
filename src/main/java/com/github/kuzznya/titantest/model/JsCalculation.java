@@ -1,7 +1,8 @@
 package com.github.kuzznya.titantest.model;
 
-import com.github.kuzznya.titantest.exception.EvaluationException;
-import com.github.kuzznya.titantest.exception.InternalEvaluationException;
+import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
+import com.github.kuzznya.titantest.exception.FunctionExecutionException;
+import com.github.kuzznya.titantest.exception.InternalCalculationException;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -14,20 +15,18 @@ public class JsCalculation implements Calculation {
 
     private final ScriptEngine engine;
 
-    private Integer functionHashCode;
-
-    public JsCalculation(String code) {
+    public JsCalculation(String code) throws FunctionEvaluationException {
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
         try {
             engine.eval("function test(idx) {" + code + "}");
         } catch (ScriptException ex) {
-            throw new EvaluationException(ex);
+            throw new FunctionEvaluationException(ex);
         }
     }
 
     @Override
-    public CalculationResult calculate(int idx) {
+    public CalculationResult calculate(int idx) throws FunctionExecutionException {
         try {
             Invocable invocable = (Invocable) engine;
 
@@ -38,9 +37,9 @@ public class JsCalculation implements Calculation {
             return new CalculationResult(idx, result, Duration.between(start, end));
 
         } catch (ScriptException ex) {
-            throw new EvaluationException(ex);
+            throw new FunctionExecutionException(ex);
         } catch (NoSuchMethodException ex) {
-            throw new InternalEvaluationException(ex);
+            throw new InternalCalculationException(ex);
         }
     }
 }
