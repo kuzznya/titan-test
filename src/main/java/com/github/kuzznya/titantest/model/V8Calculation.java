@@ -13,6 +13,14 @@ public class V8Calculation implements Calculation {
 
     public V8Calculation(String code) {
         this.code = code;
+
+        V8 runtime = V8.createV8Runtime();
+        try {
+            runtime.executeScript("function test(idx) {" + code + "}");
+        } catch (Exception ex) {
+            throw new FunctionEvaluationException(ex);
+        }
+        runtime.release();
     }
 
     @Override

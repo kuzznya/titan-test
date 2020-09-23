@@ -1,5 +1,7 @@
 package com.github.kuzznya.titantest.exception;
 
+import lombok.Getter;
+
 public class CalculationException extends RuntimeException {
     public CalculationException() {
         super("Calculation error");

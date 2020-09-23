@@ -1,5 +1,8 @@
 package com.github.kuzznya.titantest.service;
 
+import com.github.kuzznya.titantest.exception.CalculationException;
+import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
+import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.model.Calculation;
 import com.github.kuzznya.titantest.model.CalculationResult;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
@@ -7,6 +10,7 @@ import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
 import com.github.kuzznya.titantest.properties.CalculationProperties;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -24,10 +28,13 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
     }
 
     private Flux<CalculationResult> calculate(String function, int count) {
-        final Calculation calculation = factoryService.createCalculation(function);
-        return Flux.fromStream(IntStream.range(0, count).boxed())
+        final Mono<Calculation> calculation = Mono
+                .fromSupplier(() -> factoryService.createCalculation(function));
+        return calculation
+                .flatMapMany(calc -> Flux.fromStream(IntStream.range(0, count).boxed())
                 .delayElements(properties.getEvaluationDelay())
-                .map(calculation::calculate);
+                .map(calc::calculate)
+        );
     }
 
     @Override
@@ -39,7 +46,8 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
                                 1,
                                 calculationResult.getResult(),
                                 calculationResult.getExecutionTime())
-                        ),
+                        )
+                ,
                 calculate(function2, count)
                         .map(calculationResult -> new UnorderedCalculationResult(
                                 calculationResult.getCalculationId(),
@@ -54,8 +62,11 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
     public Flux<OrderedCalculationResult> calculateOrdered(String function1, String function2, int count) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        Flux<CalculationResult> calculation1 = calculate(function1, count).doOnNext(result -> counter.incrementAndGet());
-        Flux<CalculationResult> calculation2 = calculate(function2, count).doOnNext(result -> counter.decrementAndGet());
+        Flux<CalculationResult> calculation1 = calculate(function1, count)
+                .doOnNext(result -> counter.incrementAndGet());
+
+        Flux<CalculationResult> calculation2 = calculate(function2, count)
+                .doOnNext(result -> counter.decrementAndGet());
 
         return calculation1.zipWith(calculation2,
                 (result1, result2) -> OrderedCalculationResult
