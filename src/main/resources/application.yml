@@ -4,3 +4,5 @@ titantest:
 server:
   error:
     include-stacktrace: never
+springdoc:
+  version: 1.0.0
