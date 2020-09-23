@@ -1,6 +1,7 @@
 package com.github.kuzznya.titantest.web;
 
 import com.github.kuzznya.titantest.dto.CalculationRequest;
+import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
 import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
 import com.github.kuzznya.titantest.model.UnorderedCalculationResult;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.util.function.Predicate;
 
 @Component
 public class CalculationHandler {
@@ -33,7 +36,8 @@ public class CalculationHandler {
                                 .map(UnorderedCalculationResult::getDataAsString)
                                 .onErrorResume(FunctionExecutionException.class,
                                         ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
-                                .onErrorReturn("EXECUTION ERROR"),
+                                .onErrorReturn(Predicate.not(e -> e instanceof FunctionEvaluationException),
+                                        "EXECUTION ERROR"),
                         String.class
                 )
         );
@@ -52,7 +56,8 @@ public class CalculationHandler {
                                         .map(OrderedCalculationResult::getDataAsString)
                                         .onErrorResume(FunctionExecutionException.class,
                                                 ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
-                                        .onErrorReturn("EXECUTION ERROR"),
+                                        .onErrorReturn(Predicate.not(e -> e instanceof FunctionEvaluationException),
+                                                "EXECUTION ERROR"),
                                 String.class
                         )
         );
