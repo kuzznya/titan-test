@@ -1,26 +1,63 @@
-# Реактивный RESTful Web Service “Калькулятор” с использованием Spring WebFlux.
+# Reactive RESTful Web Service Calculator
 
-При вызове сервиса клиент должен передать ему четыре параметра:
-1. Текст JS/Python-функции №1 от 1 параметра Int;
-2. Текст JS/Python-функции №2 от 1 параметра Int;
-3. Количество расчетов, которые необходимо выполнить;
-4. Признак выравнивания ответа (выдавать ответ в упорядоченном CSV-формате, либо выдавать результаты по мере их получения).
+[Original task](TASK.md)
 
-Сервис работает следующим образом:
-1. По таймеру, через определенный (возможно указать в конфигурации) интервал, запускается итерация расчета;
-2. Для каждого существующего в настоящий момент клиентского запроса производится вычисление результатов функции №1 и функции №2. Текст функций написан на языке JavaScript либо Python (выбор языка на Ваше усмотрение) и должен вызываться из Вашего Java сервиса соответствующим образом. В качестве единственного параметра при вызове функций передается порядковый номер ее вызова, который уникален и отсчитывается для каждого вызова с начала. Синтаксис передачи входного значения в JS/Python-код и получение результата определите на свое усмотрение;
-3. Полученные результаты выдаются клиенту либо по мере вычисления, либо подвергаются выравниванию и выдаются в упорядоченном виде по мере возможности.
+Stack: Java 11, Spring WebFlux, J2V8 for V8 JS engine, built-in Nashorn JS engine
 
-Пример упорядоченной выдачи результатов:
-<№ итерации>, <результат функции 1>, <время расчета функции 1>, <кол-во полученных наперед результатов функции 1 (еще не выданных, в связи с медленным расчетом функции 2)>, <результат функции 2>, <время расчета функции 2>, <кол-во полученных наперед результатов функции 2 (еще не выданных, в связи с медленным расчетом функции 1)>
+Service produces series of calculations for each client request.
+For each calculation server runs two JS functions 
+passed by the client with a single argument - execution index.
+The results are returned to the client as a stream of
+ ordered or unordered data (see Modes)
 
-Пример неупорядоченной выдачи результатов:
-<№ итерации>, <номер функции>, <результат функции>, <время расчета функции>
+Response data is plain text (CSV-line formatted)
 
-При любом режиме выдачи результатов, клиент должен их получать сразу, по мере возможности (без 100% буферизации полного цикла вычислений на стороне сервиса).
+The service is built to potentially work with any script engine.
+To demonstrate it, both Nashorn & V8 JS engines were included into the project
 
-Необходимо предусмотреть возможные исключительные ситуации при выполнении JavaScript/Python кода, а также различное время выполнения функций (№1 и №2).
+## Calculation request
 
-Выбор языка для описания функций (JavaScript/Python) на Ваше усмотрение. Необходима реализация только на одном выбранном Вами языке.
+Calculation request is a JSON with 4 parameters:
+- function1 - The code of the first function
+- function2 - The code of the second function
+- count - number of calculations to execute
 
-Для проверки реализованного сервиса хотелось бы использовать Swagger.
+Function code should be defined as lines of function without its declaration.
+The code can use `idx` parameter (execution index).
+
+Function should always return value (but not necessarily int)
+
+## Modes
+
+There are two response modes:
+- **unordered** - the data is sent to the client as soon as it was calculated  
+  Response format: `<execution idx>, <function idx>, <function result>, <calculation time>`
+- **ordered** - the results of two functions with common execution index are zipped together
+and then the data is sent to the client  
+  Response format: `<execution idx>, <func1 result>, <func1 calculation time>, 
+  <count of further results of func1 already calculated>,
+  <func2 result>, <func2 calculation time>, 
+  <count of further results of func2 already calculated>`
+
+## API
+
+API is documented with OpenAPI spec (see Swagger UI at `/swagger-ui.html`)
+
+Calculation request: `POST /api/v1/calculations/{mode}`
+
+## Errors
+
+If function code syntax is invalid, the response with status **400 BAD REQUEST** is returned
+with corresponding message as a JSON
+
+If error occurs during the execution, 
+the `EXECUTION ERROR` (or `EXECUTION <idx> ERROR`) is returned.
+The reason of such behaviour is that 
+server already responded with status **200 OK** and cannot change it.
+
+## Service configuration
+
+The configuration consists of two properties:
+- `titantest.delay-millis` - the delay between function executions
+- `titantest.js-engine` - JS engine to execute the script (`nashorn`/`v8`)
+
