@@ -13,9 +13,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(properties = "titantest.js-engine=nashorn")
 @Import({CalculationConfiguration.class, DefaultCalculationSeriesService.class, CalculationHandler.class, CalculationRouter.class})
-public class NashornCalculationTest extends CalculationApiTest {
+public class NashornCalculationApiTest extends CalculationApiTest {
 
-    public NashornCalculationTest(@Autowired WebTestClient webClient) {
+    public NashornCalculationApiTest(@Autowired WebTestClient webClient) {
         super(webClient);
     }
 

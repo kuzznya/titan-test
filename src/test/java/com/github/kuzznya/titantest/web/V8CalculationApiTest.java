@@ -13,9 +13,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(properties = "titantest.js-engine=v8")
 @Import({CalculationConfiguration.class, DefaultCalculationSeriesService.class, CalculationHandler.class, CalculationRouter.class})
-public class V8CalculationTest extends CalculationApiTest {
+public class V8CalculationApiTest extends CalculationApiTest {
 
-    public V8CalculationTest(@Autowired WebTestClient webClient) {
+    public V8CalculationApiTest(@Autowired WebTestClient webClient) {
         super(webClient);
     }
 
