@@ -17,7 +17,7 @@ To demonstrate it, both Nashorn & V8 JS engines were included into the project
 
 ## Calculation request
 
-Calculation request is a JSON with 4 parameters:
+Calculation request is a JSON with 3 parameters:
 - function1 - The code of the first function
 - function2 - The code of the second function
 - count - number of calculations to execute
@@ -25,7 +25,8 @@ Calculation request is a JSON with 4 parameters:
 Function code should be defined as lines of function without its declaration.
 The code can use `idx` parameter (execution index).
 
-Function should always return value (but not necessarily int)
+If function does not return value, then 'null' (Nashorn) or 'undefined' (V8)
+is received as a result
 
 ## Modes
 
