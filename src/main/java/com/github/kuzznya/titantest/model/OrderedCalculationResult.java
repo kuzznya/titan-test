@@ -3,6 +3,7 @@ package com.github.kuzznya.titantest.model;
 import lombok.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Getter
@@ -19,10 +20,10 @@ public class OrderedCalculationResult implements CsvResult {
     public List<Object> getData() {
         return List.of(
                 calculationId,
-                func1Result.getResult(),
+                Optional.ofNullable(func1Result.getResult()).orElse("null"),
                 func1Result.getExecutionTime().toMillis(),
                 func1FurtherResultsCount,
-                func2Result.getResult(),
+                Optional.ofNullable(func2Result.getResult()).orElse("null"),
                 func2Result.getExecutionTime().toMillis(),
                 func2FurtherResultsCount
         );

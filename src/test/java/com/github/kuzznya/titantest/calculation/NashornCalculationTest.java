@@ -27,6 +27,11 @@ public class NashornCalculationTest extends CalculationTest {
         super.calculate_WhenNoErrors_ReturnValue();
     }
 
+    @Override
+    public void calculate_WhenNoReturn_ReturnNull() {
+        super.calculate_WhenNoReturn_ReturnNull();
+    }
+
     @Test
     @Override
     public void calculate_WhenExecutionError_ThrowException() {

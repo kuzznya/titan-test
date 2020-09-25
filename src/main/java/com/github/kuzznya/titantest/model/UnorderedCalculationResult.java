@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +19,11 @@ public class UnorderedCalculationResult extends CalculationResult implements Csv
 
     @Override
     public List<Object> getData() {
-        return List.of(super.getCalculationId(), funcId, super.getResult(), super.getExecutionTime().toMillis());
+        return List.of(
+                super.getCalculationId(),
+                funcId,
+                Optional.ofNullable(super.getResult()).orElse("null"),
+                super.getExecutionTime().toMillis()
+        );
     }
 }

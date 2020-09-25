@@ -33,9 +33,9 @@ public abstract class CalculationTest {
 
     public void calculate_WhenNoErrors_ReturnValue() {
         Object result = calculationFactory
-                        .createCalculation("return idx * 2;")
-                        .calculate(1)
-                        .getResult();
+                .createCalculation("return idx * 2;")
+                .calculate(1)
+                .getResult();
 
         assertTrue(result instanceof Integer || result instanceof Double);
         if (result instanceof Integer)
@@ -46,6 +46,15 @@ public abstract class CalculationTest {
         assertEquals("String with 1",
                 calculationFactory
                         .createCalculation("return 'String with ' + idx;")
+                        .calculate(1)
+                        .getResult()
+        );
+    }
+
+    public void calculate_WhenNoReturn_ReturnNull() {
+        assertNull(
+                calculationFactory
+                        .createCalculation("idx *= 2;")
                         .calculate(1)
                         .getResult()
         );
