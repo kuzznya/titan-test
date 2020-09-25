@@ -51,15 +51,6 @@ public abstract class CalculationTest {
         );
     }
 
-    public void calculate_WhenNoReturn_ReturnNull() {
-        assertNull(
-                calculationFactory
-                        .createCalculation("idx *= 2;")
-                        .calculate(1)
-                        .getResult()
-        );
-    }
-
     public void calculate_WhenExecutionError_ThrowException() {
         assertThrows(FunctionExecutionException.class,
                 () -> calculationFactory

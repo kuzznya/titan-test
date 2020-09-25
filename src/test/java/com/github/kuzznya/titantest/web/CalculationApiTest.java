@@ -88,6 +88,31 @@ public abstract class CalculationApiTest {
                 .verify();
     }
 
+    public void calculateUnordered_WhenFunctionReturnNull_ReturnResultWithNullOrUndefined() {
+        Flux<String> result = webClient.post()
+                .uri("/api/v1/calculations/unordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "idx *= 2;",
+                                "var now = new Date().getTime();\n" +
+                                        "while(new Date().getTime() < now + 100){ }\n" +
+                                        "return idx * 2;",
+                                1
+                        ))
+                )
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class)
+                .getResponseBody();
+
+        StepVerifier.create(result)
+                .expectNextMatches(s -> s.matches("0, 1, (null|undefined), \\d+"))
+                .expectNextMatches(s -> s.matches("0, 2, 0(\\.0)?, \\d+"))
+                .expectComplete()
+                .verify();
+    }
+
     public void calculateOrdered_WhenValidRequest_GetResult() {
         Flux<String> result = webClient.post()
                 .uri("/api/v1/calculations/ordered")

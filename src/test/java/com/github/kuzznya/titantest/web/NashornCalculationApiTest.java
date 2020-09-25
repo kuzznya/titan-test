@@ -39,6 +39,12 @@ public class NashornCalculationApiTest extends CalculationApiTest {
 
     @Test
     @Override
+    public void calculateUnordered_WhenFunctionReturnNull_ReturnResultWithNullOrUndefined() {
+        super.calculateUnordered_WhenFunctionReturnNull_ReturnResultWithNullOrUndefined();
+    }
+
+    @Test
+    @Override
     public void calculateOrdered_WhenValidRequest_GetResult() {
         super.calculateOrdered_WhenValidRequest_GetResult();
     }
