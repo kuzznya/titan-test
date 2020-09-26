@@ -1,5 +1,8 @@
 #!/bin/bash
 
+! [ -f send.sh ] && echo "Error: missing send.sh" && exit 254
+! [ -x send.sh ] && echo "Error: send.sh is not executable" && exit 254
+
 func1="
 idx += 5;
 return idx;
@@ -8,24 +11,17 @@ return idx;
 func2="
 idx *= 2;
 var now = new Date().getTime();
-while(new Date().getTime() < now + 2000){} 
+while(new Date().getTime() < now + 2000){}
 return idx;
 "
 
-count=10
+[ -z "$1" ] && count=10 || count="$1"
 
-data="{
-\"function1\": \"$func1\",
-\"function2\": \"$func2\",
-\"count\": $count
-}"
+[ -z "$2" ] && type="unordered" || type="$2"
 
-data="${data//[$'\t\r\n']}"
-
-type=ordered
-
-curl --header "Content-Type: application/json" \
-     --request POST \
-     --data "$data" \
-     -w "HTTP STATUS: %{http_code}" \
-     http://localhost:8080/api/v1/calculations/$type
+if [[ "$type" = "ordered" || "$type" = "unordered" ]] ; then
+  ./send.sh "$func1" "$func2" "$count" "$type"
+else
+  echo "type can be ordered or unordered"
+  exit 253
+fi
