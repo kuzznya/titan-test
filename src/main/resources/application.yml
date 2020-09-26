@@ -1,5 +1,6 @@
 titantest:
   delay-millis: 1000
+  timeout-millis: 10000
   js-engine: nashorn
 server:
   error:

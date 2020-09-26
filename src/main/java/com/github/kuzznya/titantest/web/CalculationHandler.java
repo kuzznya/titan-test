@@ -1,6 +1,7 @@
 package com.github.kuzznya.titantest.web;
 
 import com.github.kuzznya.titantest.dto.CalculationRequest;
+import com.github.kuzznya.titantest.exception.ExecutionTimeoutException;
 import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
 import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
@@ -63,6 +64,8 @@ public class CalculationHandler {
                                 calculationRequest.getFunction2(),
                                 calculationRequest.getCount())
                                 .map(UnorderedCalculationResult::getDataAsString)
+                                .onErrorResume(ExecutionTimeoutException.class,
+                                        ex -> Mono.just("EXECUTION TIMEOUT"))
                                 .onErrorResume(FunctionExecutionException.class,
                                         ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
                                 .onErrorReturn(Predicate.not(e -> e instanceof FunctionEvaluationException),
@@ -107,6 +110,8 @@ public class CalculationHandler {
                                         calculationRequest.getFunction2(),
                                         calculationRequest.getCount())
                                         .map(OrderedCalculationResult::getDataAsString)
+                                        .onErrorResume(ExecutionTimeoutException.class,
+                                                ex -> Mono.just("EXECUTION TIMEOUT"))
                                         .onErrorResume(FunctionExecutionException.class,
                                                 ex -> Mono.just("EXECUTION " + ex.getExecutionId() + " ERROR"))
                                         .onErrorReturn(Predicate.not(e -> e instanceof FunctionEvaluationException),

@@ -1,5 +1,6 @@
 package com.github.kuzznya.titantest.service;
 
+import com.github.kuzznya.titantest.exception.ExecutionTimeoutException;
 import com.github.kuzznya.titantest.model.Calculation;
 import com.github.kuzznya.titantest.model.CalculationResult;
 import com.github.kuzznya.titantest.model.OrderedCalculationResult;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -29,8 +31,10 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
                 .fromSupplier(() -> calculationFactory.createCalculation(function));
         return calculation
                 .flatMapMany(calc -> Flux.fromStream(IntStream.range(0, count).boxed())
-                .delayElements(properties.getEvaluationDelay())
-                .map(calc::calculate)
+                        .delayElements(properties.getEvaluationDelay())
+                        .map(calc::calculate)
+                        .timeout(properties.getExecutionTimeout())
+                        .onErrorMap(TimeoutException.class, ExecutionTimeoutException::new)
         );
     }
 

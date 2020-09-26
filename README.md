@@ -58,7 +58,8 @@ server already responded with status **200 OK** and cannot change it.
 
 ## Service configuration
 
-The configuration consists of two properties:
+The configuration consists of three properties:
 - `titantest.delay-millis` - the delay between function executions
+- `titantest.timeout-millis` - function execution timeout
 - `titantest.js-engine` - JS engine to execute the script (`nashorn`/`v8`)
 

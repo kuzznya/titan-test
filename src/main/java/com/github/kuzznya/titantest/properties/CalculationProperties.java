@@ -10,10 +10,16 @@ import java.time.Duration;
 public class CalculationProperties {
     private int delayMillis = 1000;
 
+    private int timeoutMillis = 10000;
+
     private JsEngine jsEngine = JsEngine.NASHORN;
 
     public Duration getEvaluationDelay() {
         return Duration.ofMillis(delayMillis);
+    }
+
+    public Duration getExecutionTimeout() {
+        return Duration.ofMillis(timeoutMillis);
     }
 
     public enum JsEngine {
