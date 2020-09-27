@@ -72,7 +72,6 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
         return calculation1.zipWith(calculation2,
                 (result1, result2) -> OrderedCalculationResult
                         .builder()
-                        .calculationId(result1.getCalculationId())
                         .func1Result(result1)
                         .func1FurtherResultsCount(Math.max(counter.get(), 0))
                         .func2Result(result2)
