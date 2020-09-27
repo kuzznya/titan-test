@@ -1,5 +1,8 @@
 # Reactive RESTful Web Service Calculator
 
+![build](https://github.com/kuzznya/titan-test/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/kuzznya/titan-test/branch/master/graph/badge.svg?token=I7M2DeCwpl)](undefined)
+
 [Original task](TASK.md)
 
 Stack: Java 11, Spring WebFlux, J2V8 for V8 JS engine, built-in Nashorn JS engine
