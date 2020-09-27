@@ -1,7 +1,7 @@
 # Reactive RESTful Web Service Calculator
 
 ![build](https://github.com/kuzznya/titan-test/workflows/build/badge.svg)
-[![codecov](https://codecov.io/gh/kuzznya/titan-test/branch/master/graph/badge.svg?token=I7M2DeCwpl)](undefined)
+[![codecov](https://codecov.io/gh/kuzznya/titan-test/branch/master/graph/badge.svg?token=I7M2DeCwpl)](https://codecov.io/gh/kuzznya/titan-test)
 
 [Original task](TASK.md)
 
