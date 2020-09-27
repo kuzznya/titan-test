@@ -19,21 +19,23 @@ public abstract class CalculationTest {
                 "for (var i = 0; i < 100; i++) {\n" +
                         "idx += 1;\n" +
                         "}\n" +
-                        "return idx;"
+                        "return idx;",
+                10000
         ));
     }
 
     public void createCalculation_WhenInvalidCode_ThrowException() {
         assertThrows(FunctionEvaluationException.class,
                 () -> calculationFactory.createCalculation(
-                        "for (var i = 0; i < 100; i++) {\n"
+                        "for (var i = 0; i < 100; i++) {\n",
+                        10000
                 )
         );
     }
 
     public void calculate_WhenNoErrors_ReturnValue() {
         Object result = calculationFactory
-                .createCalculation("return idx * 2;")
+                .createCalculation("return idx * 2;", 10000)
                 .calculate(1)
                 .getResult();
 
@@ -45,7 +47,7 @@ public abstract class CalculationTest {
 
         assertEquals("String with 1",
                 calculationFactory
-                        .createCalculation("return 'String with ' + idx;")
+                        .createCalculation("return 'String with ' + idx;", 10000)
                         .calculate(1)
                         .getResult()
         );
@@ -54,7 +56,7 @@ public abstract class CalculationTest {
     public void calculate_WhenExecutionError_ThrowException() {
         assertThrows(FunctionExecutionException.class,
                 () -> calculationFactory
-                        .createCalculation("throw new Error('some error')")
+                        .createCalculation("throw new Error('some error')", 10000)
                         .calculate(0)
         );
     }

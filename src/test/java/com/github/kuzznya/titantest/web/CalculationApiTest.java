@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.util.function.Predicate;
+
 public abstract class CalculationApiTest {
 
     private final WebTestClient webClient;
@@ -36,8 +38,12 @@ public abstract class CalculationApiTest {
 
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            step = step.expectNextMatches(s -> s.matches(finalI + ", 1, " + finalI + "(\\.0)?, \\d+"));
-            step = step.expectNextMatches(s -> s.matches(finalI + ", 2, " + finalI * 2 + "(\\.0)?, \\d+"));
+            Predicate<String> resultPredicate = s ->
+                    s.matches(finalI + ", 1, " + finalI + "(\\.0)?, \\d+") ||
+                            s.matches(finalI + ", 2, " + finalI * 2 + "(\\.0)?, \\d+");
+
+            step = step.expectNextMatches(resultPredicate);
+            step = step.expectNextMatches(resultPredicate);
         }
         step.expectComplete().verify();
     }
@@ -113,6 +119,29 @@ public abstract class CalculationApiTest {
                 .verify();
     }
 
+    public void calculateUnordered_WhenTooLong_ReturnExecutionTimeout() {
+        Flux<String> result = webClient.post()
+                .uri("/api/v1/calculations/unordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "while (true) {} ",
+                                        "return idx * 2;",
+                                1
+                        ))
+                )
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class)
+                .getResponseBody();
+
+        StepVerifier.create(result)
+                .expectNextMatches(s -> s.matches("0, 2, 0(\\.0)?, \\d+"))
+                .expectNext("EXECUTION TIMEOUT")
+                .expectComplete()
+                .verify();
+    }
+
     public void calculateOrdered_WhenValidRequest_GetResult() {
         Flux<String> result = webClient.post()
                 .uri("/api/v1/calculations/ordered")
@@ -180,6 +209,29 @@ public abstract class CalculationApiTest {
                 .expectNextMatches(s -> s.matches("0, 0(\\.0)?, \\d+, 0, 0(\\.0)?, \\d+, 0"))
                 .expectNextMatches(s -> s.matches("1, 1(\\.0)?, \\d+, 0, 2(\\.0)?, \\d+, 0"))
                 .expectNextMatches(s -> s.matches("EXECUTION (\\d+ )?ERROR"))
+                .expectComplete()
+                .verify();
+    }
+
+    public void calculateOrdered_WhenTimeoutReached_ReturnExecutionTimeout() {
+        Flux<String> result = webClient.post()
+                .uri("/api/v1/calculations/ordered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(
+                        new CalculationRequest(
+                                "if (idx === 1) while (true) {} ",
+                                "return idx * 2;",
+                                2
+                        ))
+                )
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class)
+                .getResponseBody();
+
+        StepVerifier.create(result)
+                .expectNextCount(1)
+                .expectNext("EXECUTION TIMEOUT")
                 .expectComplete()
                 .verify();
     }

@@ -28,13 +28,14 @@ public class DefaultCalculationSeriesService implements CalculationSeriesService
 
     private Flux<CalculationResult> calculate(String function, int count) {
         final Mono<Calculation> calculation = Mono
-                .fromSupplier(() -> calculationFactory.createCalculation(function));
+                .fromSupplier(() -> calculationFactory
+                        .createCalculation(function, properties.getTimeoutMillis())
+                );
+
         return calculation
                 .flatMapMany(calc -> Flux.fromStream(IntStream.range(0, count).boxed())
                         .delayElements(properties.getEvaluationDelay())
                         .map(calc::calculate)
-                        .timeout(properties.getExecutionTimeout())
-                        .onErrorMap(TimeoutException.class, ExecutionTimeoutException::new)
         );
     }
 

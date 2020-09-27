@@ -13,6 +13,10 @@ public class FunctionExecutionException extends CalculationException {
         super("Error occurred while trying to execute the function");
     }
 
+    public FunctionExecutionException(String message) {
+        super(message);
+    }
+
     public FunctionExecutionException(int executionId) {
         super("Error occurred while trying to execute the function on execution " + executionId);
         this.executionId = executionId;

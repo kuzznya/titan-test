@@ -1,5 +1,6 @@
 package com.github.kuzznya.titantest.model;
 
+import com.github.kuzznya.titantest.exception.ExecutionTimeoutException;
 import com.github.kuzznya.titantest.exception.FunctionEvaluationException;
 import com.github.kuzznya.titantest.exception.FunctionExecutionException;
 import com.github.kuzznya.titantest.exception.InternalCalculationException;
@@ -19,7 +20,7 @@ public class JsCalculation implements Calculation {
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
         try {
-            engine.eval("function test(idx) {" + code + "}");
+            engine.eval(code);
         } catch (ScriptException ex) {
             throw new FunctionEvaluationException(ex);
         }
@@ -37,6 +38,9 @@ public class JsCalculation implements Calculation {
             return new CalculationResult(idx, result, Duration.between(start, end));
 
         } catch (ScriptException ex) {
+            if (ex.getMessage().contains(CalculationScriptPreprocessor.EXECUTION_TIMEOUT_ERROR_MESSAGE))
+                throw new ExecutionTimeoutException(ex);
+
             throw new FunctionExecutionException(idx, ex);
         } catch (NoSuchMethodException ex) {
             throw new InternalCalculationException(ex);
