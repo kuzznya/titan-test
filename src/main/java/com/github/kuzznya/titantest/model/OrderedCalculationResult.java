@@ -26,10 +26,14 @@ public class OrderedCalculationResult implements CsvResult {
         this.func2FurtherResultsCount = func2FurtherResultsCount;
     }
 
+    public int getCalculationId() {
+        return func1Result.getCalculationId();
+    }
+
     @Override
     public List<Object> getData() {
         return List.of(
-                func1Result.getCalculationId(),
+                getCalculationId(),
                 Optional.ofNullable(func1Result.getResult()).orElse("null"),
                 func1Result.getExecutionTime().toMillis(),
                 func1FurtherResultsCount,
