@@ -52,7 +52,7 @@ If function code syntax is invalid, the response with status **400 BAD REQUEST**
 with corresponding message as a JSON
 
 If error occurs during the execution, 
-the `EXECUTION ERROR` (or `EXECUTION <idx> ERROR`) is returned.
+the `EXECUTION ERROR`, `EXECUTION <idx> ERROR`, `EXECUTION TIMEOUT` can be returned.
 The reason of such behaviour is that 
 server already responded with status **200 OK** and cannot change it.
 
