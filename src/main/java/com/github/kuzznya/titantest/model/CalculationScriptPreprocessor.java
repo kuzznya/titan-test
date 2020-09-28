@@ -27,10 +27,13 @@ public class CalculationScriptPreprocessor {
     }
 
     private String preprocessForLoops(String scriptCode) {
-        Pattern pattern = Pattern.compile("for\\s*\\([^;]*?;");
+        Pattern pattern = Pattern.compile("for\\s*\\([^;]*;");
         Matcher matcher = pattern.matcher(scriptCode);
         return matcher
-                .replaceAll(matchResult -> matchResult.group() + "!exitOnTimeout(START_) &&")
+                .replaceAll(matchResult ->
+                        matchResult.group().matches(".*for\\s*\\(.+(in|of)\\s+.*") ?
+                                matchResult.group() :
+                                matchResult.group() + "!exitOnTimeout(START_) &&")
                 .replaceAll("&&\\s*;", ";");
 
     }
@@ -45,6 +48,7 @@ public class CalculationScriptPreprocessor {
 
         scriptCode = preprocessWhileLoops(scriptCode);
         scriptCode = preprocessForLoops(scriptCode);
+        System.out.println(scriptCode);
 
         return exitOnTimeoutFunction + "\nfunction test(idx) { " + scriptCode + " }";
     }
