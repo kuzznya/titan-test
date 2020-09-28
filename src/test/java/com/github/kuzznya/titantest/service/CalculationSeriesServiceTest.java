@@ -11,7 +11,7 @@ import reactor.test.StepVerifier;
 
 import java.util.function.Predicate;
 
-@SpringBootTest(properties = "titantest.delay-millis=100")
+@SpringBootTest(properties = {"titantest.delay-millis=100", "titantest.timeout-millis=3000"})
 public class CalculationSeriesServiceTest {
 
     private final CalculationSeriesService seriesService;
@@ -67,6 +67,18 @@ public class CalculationSeriesServiceTest {
                 .expectNextCount(1)
                 .expectError(ExecutionTimeoutException.class)
                 .verify();
+
+        Flux<UnorderedCalculationResult> result2 =
+                seriesService.calculateUnordered(
+                        "for (;;) idx += 1;",
+                        "return idx;",
+                        1
+                );
+
+        StepVerifier.create(result2)
+                .expectNextCount(1)
+                .expectError(ExecutionTimeoutException.class)
+                .verify();
     }
 
     @Test
@@ -105,6 +117,17 @@ public class CalculationSeriesServiceTest {
                 );
 
         StepVerifier.create(result)
+                .expectError(ExecutionTimeoutException.class)
+                .verify();
+
+        Flux<OrderedCalculationResult> result2 =
+                seriesService.calculateOrdered(
+                        "for (;;) idx += 1;",
+                        "return idx;",
+                        3
+                );
+
+        StepVerifier.create(result2)
                 .expectError(ExecutionTimeoutException.class)
                 .verify();
     }
